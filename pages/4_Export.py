@@ -15,9 +15,11 @@ state_codes = [s["code"] for s in states] if states else []
 pick = st.multiselect("Limit to state(s) — leave empty for ALL states", state_codes)
 
 if pick:
-    staff_data = fetch_all(lambda: sb.table("staff").select("*").in_("state_code", pick))
+    staff_data = fetch_all(
+        lambda: sb.table("staff").select("*").in_("state_code", pick).order("created_at", desc=True)
+    )
 else:
-    staff_data = fetch_all(lambda: sb.table("staff").select("*"))
+    staff_data = fetch_all(lambda: sb.table("staff").select("*").order("created_at", desc=True))
 staff_ids = [s["id"] for s in staff_data]
 
 if pick:
@@ -25,10 +27,13 @@ if pick:
         lambda: sb.table("test_instances")
         .select("*, staff!inner(state_code, level, designation, tu)")
         .in_("staff.state_code", pick)
+        .order("assigned_at", desc=True)
     )
 else:
     instances_data = fetch_all(
-        lambda: sb.table("test_instances").select("*, staff!inner(state_code, level, designation, tu)")
+        lambda: sb.table("test_instances")
+        .select("*, staff!inner(state_code, level, designation, tu)")
+        .order("assigned_at", desc=True)
     )
 
 staff_df = pd.DataFrame(staff_data)

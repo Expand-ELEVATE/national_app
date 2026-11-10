@@ -61,7 +61,13 @@ if submitted:
 st.divider()
 st.subheader("Existing National admin logins")
 
-profiles = sb.table("admin_profiles").select("user_id, role").eq("role", "national").execute()
+profiles = (
+    sb.table("admin_profiles")
+    .select("user_id, role, created_at")
+    .eq("role", "national")
+    .order("created_at", desc=True)
+    .execute()
+)
 rows = []
 for p in (profiles.data or []):
     try:

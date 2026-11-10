@@ -65,7 +65,7 @@ if submitted:
 st.divider()
 st.subheader("Existing admin logins")
 
-profiles = sb.table("admin_profiles").select("user_id, role, state_code").execute()
+profiles = sb.table("admin_profiles").select("user_id, role, state_code, created_at").order("created_at", desc=True).execute()
 rows = []
 for p in (profiles.data or []):
     try:

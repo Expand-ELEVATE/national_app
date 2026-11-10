@@ -45,8 +45,11 @@ if pick_level != "All":
 
 # Pair pre/post per staff_id
 pre = filtered[filtered["stage"] == "pre"][["staff_id", "score"]].rename(columns={"score": "pre_score"})
-post = filtered[filtered["stage"] == "post"][["staff_id", "score"]].rename(columns={"score": "post_score"})
+post = filtered[filtered["stage"] == "post"][["staff_id", "score", "submitted_at"]].rename(
+    columns={"score": "post_score"}
+)
 paired = pre.merge(post, on="staff_id", how="inner").dropna()
+paired = paired.sort_values("submitted_at", ascending=False).drop(columns=["submitted_at"])
 
 st.metric("Staff with BOTH pre and post completed (paired)", len(paired))
 st.metric("Total completed instances in view", len(filtered))
