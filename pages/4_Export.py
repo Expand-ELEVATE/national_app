@@ -20,7 +20,7 @@ if pick:
 staff_data = staff_q.execute().data or []
 staff_ids = [s["id"] for s in staff_data]
 
-instances_q = sb.table("test_instances").select("*, staff!inner(state_code, level, designation, tu_name)")
+instances_q = sb.table("test_instances").select("*, staff!inner(state_code, level, designation, tu)")
 if pick:
     instances_q = instances_q.in_("staff.state_code", pick)
 instances_data = instances_q.execute().data or []
