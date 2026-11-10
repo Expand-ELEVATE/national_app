@@ -19,6 +19,8 @@ st.markdown(
       every state deployment is matched against)
     - **Manage State Logins** — create, reset, or revoke State admin login
       credentials directly from this UI
+    - **Manage National Logins** — create, reset, or revoke National admin
+      login credentials directly from this UI
     """
 )
 
