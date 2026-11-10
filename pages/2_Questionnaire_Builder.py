@@ -34,8 +34,15 @@ st.markdown(
     Upload a CSV with exactly these columns:
     `question_no, question_text, option_a, option_b, option_c, option_d, correct_option`
 
-    `correct_option` must be one of `A`, `B`, `C`, `D`.
-    See `docs/questionnaire_template.csv` in the repo for a template.
+    - `correct_option` must be one of `A`, `B`, `C`, `D`.
+    - To **bold important words** in a question, wrap them in double
+      asterisks in `question_text`, e.g. `What is the **maximum** value?`
+      — this is the only markdown formatting staff will see; everything
+      else (including Excel-formula-style text like `$A$2` or `=SUM(A2:A10)`)
+      renders as plain literal text, never italic or broken formatting.
+    - Option text (`option_a`..`option_d`) is always shown as plain text —
+      bolding is not applied there, only in `question_text`.
+    - See `docs/questionnaire_template.csv` in the repo for a template.
     """
 )
 
