@@ -2,7 +2,7 @@
 import streamlit as st
 import pandas as pd
 from scipy import stats
-from common import require_login, get_admin_client
+from common import require_login, get_admin_client, fetch_all
 
 require_login()
 sb = get_admin_client()
@@ -15,14 +15,13 @@ if not qmeta.data:
 questionnaire_id = qmeta.data[0]["id"]
 st.caption(f"Active questionnaire: **{qmeta.data[0]['title']}**")
 
-instances = (
-    sb.table("test_instances")
+instances = fetch_all(
+    lambda: sb.table("test_instances")
     .select("*, staff!inner(state_code, level, designation)")
     .eq("questionnaire_id", questionnaire_id)
     .eq("status", "completed")
-    .execute()
 )
-df = pd.json_normalize(instances.data) if instances.data else pd.DataFrame()
+df = pd.json_normalize(instances) if instances else pd.DataFrame()
 
 if df.empty:
     st.info("No completed test instances yet.")

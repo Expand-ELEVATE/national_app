@@ -3,27 +3,33 @@ import streamlit as st
 import pandas as pd
 from io import BytesIO
 from zipfile import ZipFile
-from common import require_login, get_admin_client
+from common import require_login, get_admin_client, fetch_all
 
 require_login()
 sb = get_admin_client()
 st.title("Export")
 
-states = sb.table("states").select("*").order("name").execute()
-state_codes = [s["code"] for s in states.data] if states.data else []
+states = fetch_all(lambda: sb.table("states").select("*").order("name"))
+state_codes = [s["code"] for s in states] if states else []
 
 pick = st.multiselect("Limit to state(s) — leave empty for ALL states", state_codes)
 
-staff_q = sb.table("staff").select("*")
 if pick:
-    staff_q = staff_q.in_("state_code", pick)
-staff_data = staff_q.execute().data or []
+    staff_data = fetch_all(lambda: sb.table("staff").select("*").in_("state_code", pick))
+else:
+    staff_data = fetch_all(lambda: sb.table("staff").select("*"))
 staff_ids = [s["id"] for s in staff_data]
 
-instances_q = sb.table("test_instances").select("*, staff!inner(state_code, level, designation, tu)")
 if pick:
-    instances_q = instances_q.in_("staff.state_code", pick)
-instances_data = instances_q.execute().data or []
+    instances_data = fetch_all(
+        lambda: sb.table("test_instances")
+        .select("*, staff!inner(state_code, level, designation, tu)")
+        .in_("staff.state_code", pick)
+    )
+else:
+    instances_data = fetch_all(
+        lambda: sb.table("test_instances").select("*, staff!inner(state_code, level, designation, tu)")
+    )
 
 staff_df = pd.DataFrame(staff_data)
 instances_df = pd.json_normalize(instances_data)

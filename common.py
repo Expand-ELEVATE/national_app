@@ -59,3 +59,25 @@ def login_screen():
 def require_login():
     if not login_screen():
         st.stop()
+
+
+def fetch_all(build_query, page_size: int = 1000) -> list[dict]:
+    """Page through a Supabase/PostgREST query until all rows are fetched.
+
+    PostgREST (and therefore supabase-py) silently caps any query at 1000
+    rows by default — a plain .select("*").execute() on a large table
+    returns only the first 1000 with NO error. This loops with .range()
+    until a short page signals the end. `build_query` must be a zero-arg
+    callable returning a FRESH query builder each call, since supabase-py
+    query objects are consumed once .execute()'d.
+    """
+    rows: list[dict] = []
+    offset = 0
+    while True:
+        res = build_query().range(offset, offset + page_size - 1).execute()
+        batch = res.data or []
+        rows.extend(batch)
+        if len(batch) < page_size:
+            break
+        offset += page_size
+    return rows

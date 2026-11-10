@@ -8,7 +8,7 @@ import streamlit as st
 import pandas as pd
 from io import BytesIO
 from zipfile import ZipFile
-from common import require_login, get_admin_client
+from common import require_login, get_admin_client, fetch_all
 
 require_login()
 sb = get_admin_client()
@@ -28,8 +28,8 @@ def build_backup_zip() -> bytes:
     buf = BytesIO()
     with ZipFile(buf, "w") as zf:
         for t in TABLES:
-            data = sb.table(t).select("*").execute()
-            df = pd.DataFrame(data.data) if data.data else pd.DataFrame()
+            rows = fetch_all(lambda t=t: sb.table(t).select("*"))
+            df = pd.DataFrame(rows) if rows else pd.DataFrame()
             zf.writestr(f"{t}.csv", df.to_csv(index=False))
     return buf.getvalue()
 
