@@ -17,6 +17,8 @@ st.markdown(
     - **Export** — download all data, or selected state(s), as CSV
     - **Manage States** — add/remove participating states/UTs (the master list
       every state deployment is matched against)
+    - **Manage State Logins** — create, reset, or revoke State admin login
+      credentials directly from this UI
     """
 )
 

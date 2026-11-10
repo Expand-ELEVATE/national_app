@@ -41,10 +41,10 @@ def login_screen():
             admin.table("admin_profiles")
             .select("role")
             .eq("user_id", res.user.id)
-            .single()
+            .maybe_single()
             .execute()
         )
-        if not profile.data or profile.data["role"] != "national":
+        if not profile or not profile.data or profile.data["role"] != "national":
             st.error("This account does not have national admin privileges.")
             sb.auth.sign_out()
             return False
