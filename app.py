@@ -15,6 +15,8 @@ st.markdown(
     - **Questionnaire Builder** — create the single active questionnaire
     - **Admin — Delete Data** — destructive table operations with mandatory backup prompt
     - **Export** — download all data, or selected state(s), as CSV
+    - **Manage States** — add/remove participating states/UTs (the master list
+      every state deployment is matched against)
     """
 )
 
