@@ -17,7 +17,7 @@ st.caption(f"Active questionnaire: **{qmeta.data[0]['title']}**")
 
 instances = fetch_all(
     lambda: sb.table("test_instances")
-    .select("*, staff!inner(state_code, level, designation)")
+    .select("*, staff!inner(state_code, level, designation, tu)")
     .eq("questionnaire_id", questionnaire_id)
     .eq("status", "completed")
 )
@@ -27,21 +27,32 @@ if df.empty:
     st.info("No completed test instances yet.")
     st.stop()
 
-df = df.rename(columns={"staff.state_code": "state_code", "staff.level": "level", "staff.designation": "designation"})
+df = df.rename(
+    columns={
+        "staff.state_code": "state_code",
+        "staff.level": "level",
+        "staff.designation": "designation",
+        "staff.tu": "tu",
+    }
+)
 
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 with col1:
     states = ["All"] + sorted(df["state_code"].unique().tolist())
     pick_state = st.selectbox("Filter by state", states)
 with col2:
-    levels = ["All"] + sorted(df["level"].dropna().unique().tolist())
-    pick_level = st.selectbox("Filter by level/designation", levels)
+    levels = sorted(df["level"].dropna().unique().tolist())
+    pick_levels = st.multiselect("Filter by Level", levels)
+with col3:
+    pick_tu = st.multiselect("Filter by TU", ["Yes", "No"])
 
 filtered = df.copy()
 if pick_state != "All":
     filtered = filtered[filtered["state_code"] == pick_state]
-if pick_level != "All":
-    filtered = filtered[filtered["level"] == pick_level]
+if pick_levels:
+    filtered = filtered[filtered["level"].isin(pick_levels)]
+if pick_tu:
+    filtered = filtered[filtered["tu"].isin([{"Yes": True, "No": False}[v] for v in pick_tu])]
 
 # Pair pre/post per staff_id
 pre = filtered[filtered["stage"] == "pre"][["staff_id", "score"]].rename(columns={"score": "pre_score"})
