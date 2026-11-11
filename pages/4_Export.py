@@ -25,14 +25,14 @@ staff_ids = [s["id"] for s in staff_data]
 if pick:
     instances_data = fetch_all(
         lambda: sb.table("test_instances")
-        .select("*, staff!inner(state_code, level, designation, tu)")
+        .select("*, staff!inner(state_code, level, designation)")
         .in_("staff.state_code", pick)
         .order("assigned_at", desc=True)
     )
 else:
     instances_data = fetch_all(
         lambda: sb.table("test_instances")
-        .select("*, staff!inner(state_code, level, designation, tu)")
+        .select("*, staff!inner(state_code, level, designation)")
         .order("assigned_at", desc=True)
     )
 
